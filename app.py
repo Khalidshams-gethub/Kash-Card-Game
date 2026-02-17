@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import os
 
+from game_logic import determine_required, compute_round, check_loser, rotate_dealer
+
 app = Flask(__name__)
 app.secret_key = 'kash_card_game_secret_key'
 
@@ -43,23 +45,13 @@ def round_page():
     dealer_index = session['dealer_index']
     
     if request.method == 'GET':
-        # Determine roles based on dealer_index
+        # Determine roles and required tricks using shared logic
+        required = determine_required(players, dealer_index)
         dealer = players[dealer_index]
-        suit_chooser_index = (dealer_index + 1) % 3
-        suit_chooser = players[suit_chooser_index]
-        third_player_index = (dealer_index + 2) % 3
-        third_player = players[third_player_index]
-        
-        # Set required tricks
-        required = {
-            dealer: 3,
-            suit_chooser: 8,
-            third_player: 5,
-        }
-        
+
         session['required'] = required
         session.modified = True
-        
+
         return render_template(
             'round.html',
             players=players,
@@ -80,63 +72,31 @@ def round_page():
                 actual[player] = 0
         
         required = session.get('required', {})
-        
-        # Calculate missing tricks and update scores
-        missing = {}
-        for player in players:
-            missing[player] = max(0, required[player] - actual[player])
-            session['scores'][player] += missing[player]
-        
-        # Build pending_swaps for next round based on extras
-        extra = {}
-        for player in players:
-            extra[player] = max(0, actual[player] - required[player])
-        
-        pending_swaps = {}
-        
-        # Allocate missing tricks to players who had extra
-        for debtor in players:
-            if missing[debtor] > 0:
-                pending_swaps[debtor] = {}
-                remaining_missing = missing[debtor]
-                
-                # Find creditors (players with extra tricks)
-                creditors = [(p, extra[p]) for p in players if p != debtor and extra[p] > 0]
-                creditors.sort(key=lambda x: x[0])  # Sort by name for consistency
-                
-                for creditor, _ in creditors:
-                    if remaining_missing <= 0:
-                        break
-                    # How many cards can this creditor give?
-                    can_give = min(remaining_missing, extra[creditor])
-                    pending_swaps[debtor][creditor] = can_give
-                    extra[creditor] -= can_give
-                    remaining_missing -= can_give
-        
+
+        # Use shared compute_round to update scores and build pending swaps
+        scores = session.get('scores', {})
+        scores, missing, pending_swaps = compute_round(scores, players, required, actual)
+
+        session['scores'] = scores
         session['pending_swaps'] = pending_swaps
         session.modified = True
-        
+
         # Store result info for /result page
         session['last_round_missing'] = missing
         session['last_round_actual'] = actual
-        
+
         # Check for loser (score >= 21)
-        loser = None
-        for player, score in session['scores'].items():
-            if score >= 21:
-                loser = player
-                break
-        
+        loser = check_loser(session['scores'])
         if loser:
             session['loser'] = loser
             session.modified = True
             return redirect(url_for('gameover'))
-        
+
         # Prepare for next round
-        session['dealer_index'] = (dealer_index + 1) % 3
+        session['dealer_index'] = rotate_dealer(dealer_index)
         session['round_number'] += 1
         session.modified = True
-        
+
         return redirect(url_for('result'))
 
 
