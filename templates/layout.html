@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Kash Card Game{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="theme-color" content="#6C63FF">
+    <style> /* small inline fallback for icon sizes */
+        .logo { font-size: 1.4rem; }
+    </style>
+</head>
+<body>
+    <div class="page-bg"></div>
+    <div class="app-shell">
+        <nav class="topbar">
+            <div class="brand">
+                <div class="logo">🂡</div>
+                <div class="title">Kash Card Game</div>
+            </div>
+            <div class="nav-actions">
+                <a href="{{ url_for('start') }}" class="nav-link">Start</a>
+                <a href="{{ url_for('round_page') }}" class="nav-link">Round</a>
+                <a href="{{ url_for('result') }}" class="nav-link">Result</a>
+            </div>
+        </nav>
+
+        <main class="main-container">
+            <div class="content-wrap">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <div>Designed with care — follow the swaps, rotate the dealer.</div>
+        </footer>
+    </div>
+</body>
+</html>

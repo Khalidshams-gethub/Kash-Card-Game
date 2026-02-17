@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}Game Over - Kash Card Game{% endblock %}
+
+{% block content %}
+<div class="gameover-page">
+    <div class="card hero-card">
+        <h2>Game Over</h2>
+        <p class="muted">A player reached {{ 21 }} points.</p>
+    </div>
+
+    <div class="card loser-card">
+        <h3>Loser: <span class="loser-name">{{ loser }}</span></h3>
+        <p class="muted">Reached 21 points — game ended.</p>
+    </div>
+
+    <div class="card">
+        <h3>Final Scores</h3>
+        <table class="minimal">
+            <thead><tr><th>Player</th><th>Final Score</th></tr></thead>
+            <tbody>
+                {% for player, score in scores.items() %}
+                <tr {% if player == loser %}class="loser-row"{% endif %}>
+                    <td>{{ player }}</td>
+                    <td class="score">{{ score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('reset') }}" class="btn btn-primary">Play Again</a>
+    </div>
+</div>
+{% endblock %}

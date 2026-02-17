@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block title %}Start Game - Kash Card Game{% endblock %}
+
+{% block content %}
+<div class="start-page">
+    <div class="card hero-card">
+        <h2>Welcome to Kash</h2>
+        <p class="muted">Three players. Rotate the dealer. Track misses and swaps.</p>
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+    </div>
+
+    <div class="card form-card">
+        <form method="POST" class="start-form">
+            <div class="form-row">
+                <div class="form-group"><label for="player1">Player 1</label>
+                    <input type="text" id="player1" name="player1" required autofocus placeholder="Name">
+                </div>
+                <div class="form-group"><label for="player2">Player 2</label>
+                    <input type="text" id="player2" name="player2" required placeholder="Name">
+                </div>
+                <div class="form-group"><label for="player3">Player 3</label>
+                    <input type="text" id="player3" name="player3" required placeholder="Name">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Start Game</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

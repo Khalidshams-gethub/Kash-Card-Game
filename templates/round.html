@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block title %}Round {{ round_number }} - Kash Card Game{% endblock %}
+
+{% block content %}
+<div class="round-page">
+    <div class="card header-card">
+        <div class="round-meta">
+            <div class="meta-left">
+                <h2>Round {{ round_number }}</h2>
+                <div class="muted">Dealer: <strong>{{ dealer }}</strong></div>
+            </div>
+            <div class="meta-right">
+                <div class="score-badges">
+                    {% for p in players %}
+                    <div class="badge">{{ p }}: <span class="score">{{ scores[p] }}</span></div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>Required Tricks</h3>
+            <table class="minimal">
+                <thead><tr><th>Player</th><th>Required</th></tr></thead>
+                <tbody>
+                    {% for player in players %}
+                    <tr><td>{{ player }}</td><td class="tricks-count">{{ required[player] }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Pending Swaps</h3>
+            {% if pending_swaps %}
+            <div class="swap-list">
+                {% for debtor, creditors in pending_swaps.items() %}
+                    {% for creditor, count in creditors.items() %}
+                    <div class="swap-instruction">{{ debtor }} swaps {{ count }} card{% if count>1 %}s{% endif %} with {{ creditor }} ({{ creditor }} takes LOW, {{ debtor }} takes TOP)</div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="muted">No swaps this round.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Enter Actual Tricks</h3>
+        <form method="POST" class="tricks-form">
+            <div class="form-row">
+                {% for player in players %}
+                <div class="form-group small">
+                    <label for="tricks_{{ player }}">{{ player }}</label>
+                    <input type="number" id="tricks_{{ player }}" name="tricks_{{ player }}" min="0" required value="0">
+                </div>
+                {% endfor %}
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Submit Round</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}Round {{ round_number }} Results - Kash Card Game{% endblock %}
+
+{% block content %}
+<div class="result-page">
+    <div class="card header-card">
+        <h2>Round {{ round_number }} Results</h2>
+        <div class="muted">Summary of misses, points and swaps for the next round.</div>
+    </div>
+
+    <div class="card">
+        <h3>Round Summary</h3>
+        <table class="minimal">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Required</th>
+                    <th>Actual</th>
+                    <th>Missing</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in players %}
+                <tr>
+                    <td>{{ player }}</td>
+                    <td class="tricks-count">{{ required[player] }}</td>
+                    <td class="tricks-count">{{ actual[player] }}</td>
+                    <td class="tricks-count">{{ missing[player] }}</td>
+                    <td class="points-added">+{{ missing[player] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <h3>Updated Scores</h3>
+            <table class="minimal">
+                <thead><tr><th>Player</th><th>Score</th></tr></thead>
+                <tbody>
+                    {% for player in players %}
+                    <tr><td>{{ player }}</td><td class="score">{{ scores[player] }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Swaps for Next Round</h3>
+            {% if swap_instructions %}
+            <div class="swap-list">
+                {% for instruction in swap_instructions %}
+                <div class="swap-instruction">{{ instruction }}</div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="muted">No swaps scheduled.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('round_page') }}" class="btn btn-primary">Next Round</a>
+        <a href="{{ url_for('reset') }}" class="btn btn-secondary">Restart Game</a>
+    </div>
+</div>
+{% endblock %}
